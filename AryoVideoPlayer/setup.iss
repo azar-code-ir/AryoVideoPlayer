@@ -4,7 +4,7 @@
 ; ═══════════════════════════════════════════════════════
 
 #define MyAppName "Aryo Video Player"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "AzarCoder Team"
 #define MyAppURL "https://t.me/Thesurenax"
 #define MyAppExeName "AryoVideoPlayer.exe"
