@@ -387,6 +387,7 @@
                     <StackPanel>
                         <Button Content="ℹ  اطلاعات ویدیو" Click="InfoButton_Click" Style="{StaticResource ContextMenuItem}"/>
                         <Button Content="⌨  کلیدهای میانبر" Click="ShortcutsHelp_Click" Style="{StaticResource ContextMenuItem}"/>
+                        <Button Content="🔄  بروزرسانی" Click="CheckUpdate_Click" Style="{StaticResource ContextMenuItem}"/>
                         <Border Height="1" Background="#333" Margin="8,4"/>
                         <Button Content="📖  درباره ما" Click="AboutUs_Click" Style="{StaticResource ContextMenuItem}"/>
                         <Button Content="📩  ارتباط با ما" Click="ContactUs_Click" Style="{StaticResource ContextMenuItem}"/>

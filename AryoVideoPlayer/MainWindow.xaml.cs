@@ -262,6 +262,13 @@ namespace AryoVideoPlayer
                 // پاک کردن آرگومان‌ها بعد از پردازش
                 App.StartupArgs = Array.Empty<string>();
             }
+
+            // بررسی خودکار بروزرسانی
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(5000);
+                await Dispatcher.InvokeAsync(async () => await UpdateChecker.CheckForUpdateAsync());
+            });
         }
 
         // ==================== مقداردهی اولیه ====================
@@ -1910,6 +1917,14 @@ F11         تمام صفحه";
             PopupFile.IsOpen = false;
             PopupView.IsOpen = false;
             PopupTools.IsOpen = false;
+        }
+
+        private async void CheckUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            CloseAllPopups();
+            StatusText.Text = "🔄 در حال بررسی بروزرسانی...";
+            await UpdateChecker.CheckForUpdateAsync();
+            StatusText.Text = "✅ بررسی بروزرسانی انجام شد";
         }
     }
 }
