@@ -40,3 +40,9 @@ installer/
 ## Build artifacts
 *.cache
 project.assets.json
+
+## Logs
+*.log
+
+## Publish output
+publish/
