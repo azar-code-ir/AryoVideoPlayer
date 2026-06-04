@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <AssemblyName>AryoVideoPlayer</AssemblyName>
+    <RootNamespace>AryoVideoPlayer</RootNamespace>
+    <Version>1.0.0</Version>
+    <Authors>Aryo Team</Authors>
+    <Description>Aryo Video Player - Professional Video Player</Description>
+  </PropertyGroup>
+
+  <!-- کپی ffmpeg به پوشه خروجی اگه موجود باشه -->
+  <ItemGroup Condition="Exists('$(MSBuildProjectDirectory)\ffmpeg\ffmpeg.exe')">
+    <Content Include="$(MSBuildProjectDirectory)\ffmpeg\ffmpeg.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibVLCSharp.WPF" Version="3.9.7.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23.1" />
+    <PackageReference Include="Vosk" Version="0.3.38" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Fonts\PINAR-REGULAR.TTF" />
+    <Resource Include="Fonts\PINAR-BOLD.TTF" />
+    <Resource Include="Fonts\PINAR-MEDIUM.TTF" />
+    <Resource Include="Assets\logo.png" />
+    <Resource Include="Assets\logo-16x16.ico" />
+    <Resource Include="Assets\logo-32x32.ico" />
+    <Resource Include="Assets\logo-48x48.ico" />
+    <Resource Include="Assets\logo-256x256.ico" />
+    <Resource Include="Assets\app.ico" />
+  </ItemGroup>
+
+</Project>

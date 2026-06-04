@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0f" />
+
+    <title>Aryo Video Player — Premium Windows Video Player</title>
+    <meta name="description" data-i18n="meta.description" content="A modern, fast and elegant video player for Windows. Built with WPF & .NET 9, powered by LibVLC. Subtitle translation, cinema mode, and more." />
+    <meta name="keywords" content="Aryo, video player, WPF, .NET 9, LibVLC, Windows, free video player, subtitle, translation" />
+    <meta name="author" content="AzarCoder" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Aryo Video Player — Premium Windows Video Player" />
+    <meta property="og:description" content="A modern, fast and elegant video player for Windows. Built with WPF & .NET 9." />
+    <meta property="og:image" content="assets/logo.png" />
+    <meta property="og:url" content="/" />
+    <meta property="og:site_name" content="Aryo Video Player" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Aryo Video Player" />
+    <meta name="twitter:description" content="Premium Windows video player built with .NET 9 and WPF." />
+    <meta name="twitter:image" content="assets/logo.png" />
+
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/logo-32.ico" />
+    <link rel="apple-touch-icon" href="assets/logo.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+    <!-- ============== Loading Screen ============== -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <img src="assets/logo.png" alt="Aryo" class="loader-logo" />
+            <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+        </div>
+    </div>
+
+    <!-- ============== Custom Cursor ============== -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursorFollower"></div>
+
+    <!-- ============== Mouse Glow ============== -->
+    <div class="mouse-glow" id="mouseGlow"></div>
+
+    <!-- ============== Background Effects ============== -->
+    <div class="bg-grid"></div>
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    <canvas class="particles" id="particles"></canvas>
+
+    <!-- ============== Navbar ============== -->
+    <div class="nav-backdrop" id="navBackdrop"></div>
+    <div class="nav-wrapper">
+        <nav class="nav" id="nav">
+            <div class="container nav-inner">
+                <a href="#hero" class="nav-brand">
+                    <img src="assets/logo-32.ico" alt="Aryo" class="nav-logo" />
+                    <span class="nav-brand-text">Aryo <span class="gradient">Player</span></span>
+                </a>
+                <div class="nav-menu" id="navMenu">
+                    <ul class="nav-links">
+                        <li><a href="#features" data-i18n="nav.features">Features</a></li>
+                        <li><a href="#screenshots" data-i18n="nav.screenshots">Screenshots</a></li>
+                        <li><a href="#why" data-i18n="nav.why">Why Aryo</a></li>
+                        <li><a href="#download" data-i18n="nav.download">Download</a></li>
+                        <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
+                    </ul>
+                    <div class="nav-actions">
+                        <button class="lang-toggle" id="langToggle" aria-label="Toggle language">
+                            <span class="lang-active">EN</span>
+                            <span class="lang-divider">/</span>
+                            <span class="lang-other">فا</span>
+                        </button>
+                        <a href="#download" class="btn btn-primary btn-sm">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span data-i18n="nav.getApp">Get App</span>
+                        </a>
+                    </div>
+                </div>
+                <button class="nav-burger" id="navBurger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- ============== Skip to content (a11y) ============== -->
+    <a href="#hero" class="skip-link">Skip to content</a>
+
+    <!-- ============== Toast notification ============== -->
+    <div class="toast" id="toast" role="status" aria-live="polite">
+        <div class="toast-icon" id="toastIcon">🚧</div>
+        <div class="toast-content">
+            <div class="toast-title" id="toastTitle">Coming Soon</div>
+            <div class="toast-desc" id="toastDesc">Download link will be activated soon!</div>
+        </div>
+        <button class="toast-close" id="toastClose" aria-label="Close">×</button>
+    </div>
+
+    <!-- ============== Back to top ============== -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
+    <!-- ============== Hero ============== -->
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-content reveal" data-reveal-delay="0">
+                <div class="hero-badge">
+                    <span class="dot"></span>
+                    <span data-i18n="hero.badge">Version 1.0.0 — Now Available</span>
+                </div>
+                <h1 class="hero-title">
+                    <span data-i18n="hero.title1">A new way to</span>
+                    <span class="hero-title-gradient" data-i18n="hero.title2">experience video</span>
+                    <span data-i18n="hero.title3">on Windows.</span>
+                </h1>
+                <p class="hero-subtitle" data-i18n="hero.subtitle">
+                    Aryo is a premium video player crafted with care. Powered by LibVLC, built with .NET 9 — fast, lightweight, beautiful, and absolutely free.
+                </p>
+                <div class="hero-actions">
+                    <a href="#download" class="btn btn-primary btn-lg">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span data-i18n="hero.download">Download for Windows</span>
+                    </a>
+                    <a href="https://github.com/" class="btn btn-ghost btn-lg" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        <span data-i18n="hero.github">View on GitHub</span>
+                    </a>
+                </div>
+                <div class="hero-meta">
+                    <div class="hero-meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span data-i18n="hero.meta1">Windows 10 / 11</span>
+                    </div>
+                    <div class="hero-meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span data-i18n="hero.meta2">64-bit</span>
+                    </div>
+                    <div class="hero-meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span data-i18n="hero.meta3">100% Free</span>
+                    </div>
+                    <div class="hero-meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span data-i18n="hero.meta4">No Ads</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Mockup -->
+            <div class="hero-mockup reveal" data-reveal-delay="200">
+                <div class="mockup-window">
+                    <div class="mockup-titlebar">
+                        <div class="mockup-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <div class="mockup-title">Aryo Video Player — interstellar_4k.mkv</div>
+                        <div class="mockup-icon">
+                            <img src="assets/logo-16.ico" alt="Aryo" />
+                        </div>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mockup-video">
+                            <div class="mockup-video-bg"></div>
+                            <div class="mockup-video-overlay"></div>
+                            <div class="mockup-cinema-info">
+                                <div class="mockup-subtitle">We used to look up at the sky and wonder</div>
+                                <div class="mockup-subtitle-trans">ما به آسمان نگاه می‌کردیم و تعجب می‌کردیم</div>
+                            </div>
+                            <div class="mockup-play">
+                                <svg viewBox="0 0 24 24" fill="white" width="24" height="24"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                            <div class="mockup-controls">
+                                <div class="mockup-progress">
+                                    <div class="mockup-progress-fill"></div>
+                                    <div class="mockup-progress-thumb"></div>
+                                </div>
+                                <div class="mockup-controls-row">
+                                    <span class="mockup-ctrl">⏮</span>
+                                    <span class="mockup-ctrl">▶</span>
+                                    <span class="mockup-ctrl">⏭</span>
+                                    <span class="mockup-time">01:24:18 / 02:49:32</span>
+                                    <span class="mockup-ctrl-spacer"></span>
+                                    <span class="mockup-ctrl">🔊 80%</span>
+                                    <span class="mockup-ctrl">⚡ 1.0x</span>
+                                    <span class="mockup-ctrl">⛶</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mockup-glow"></div>
+            </div>
+        </div>
+        <div class="hero-marquee">
+            <div class="marquee-track">
+                <span>MP4</span><span>•</span><span>AVI</span><span>•</span><span>MKV</span><span>•</span><span>MOV</span><span>•</span><span>WMV</span><span>•</span><span>FLV</span><span>•</span><span>WEBM</span><span>•</span><span>4K</span><span>•</span><span>HDR</span><span>•</span><span>SRT</span><span>•</span><span>ASS</span><span>•</span>
+                <span>MP4</span><span>•</span><span>AVI</span><span>•</span><span>MKV</span><span>•</span><span>MOV</span><span>•</span><span>WMV</span><span>•</span><span>FLV</span><span>•</span><span>WEBM</span><span>•</span><span>4K</span><span>•</span><span>HDR</span><span>•</span><span>SRT</span><span>•</span><span>ASS</span><span>•</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============== Features ============== -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-tag" data-i18n="features.tag">Features</div>
+                <h2 class="section-title" data-i18n="features.title">Everything you need.<br />Nothing you don't.</h2>
+                <p class="section-desc" data-i18n="features.desc">A complete set of tools designed to make video playback effortless, immersive, and beautiful.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card reveal" data-reveal-delay="0">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                    </div>
+                    <h3 data-i18n="f1.title">Modern UI</h3>
+                    <p data-i18n="f1.desc">A clean, dark, distraction-free interface inspired by modern design systems. Looks at home on Windows 11.</p>
+                </div>
+
+                <div class="feature-card reveal" data-reveal-delay="80">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    </div>
+                    <h3 data-i18n="f2.title">High Performance</h3>
+                    <p data-i18n="f2.desc">Hardware-accelerated decoding with LibVLC. Plays 4K HDR content smoothly on modest hardware.</p>
+                </div>
+
+                <div class="feature-card reveal" data-reveal-delay="160">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                    </div>
+                    <h3 data-i18n="f3.title">All Video Formats</h3>
+                    <p data-i18n="f3.desc">MP4, AVI, MKV, MOV, WMV, FLV, WebM and more. If VLC can play it, Aryo can play it.</p>
+                </div>
+
+                <div class="feature-card reveal" data-reveal-delay="240">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    </div>
+                    <h3 data-i18n="f4.title">Smart Playlists</h3>
+                    <p data-i18n="f4.desc">Build, sort and save playlists in M3U format. Shuffle, loop and resume where you left off.</p>
+                </div>
+
+                <div class="feature-card reveal" data-reveal-delay="320">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    </div>
+                    <h3 data-i18n="f5.title">Lightweight</h3>
+                    <p data-i18n="f5.desc">No bloat, no telemetry, no background services. Installs in seconds, runs on anything.</p>
+                </div>
+
+                <div class="feature-card reveal" data-reveal-delay="400">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                    <h3 data-i18n="f6.title">Custom Controls</h3>
+                    <p data-i18n="f6.desc">Fine-tune brightness, contrast, saturation, speed (0.25x–3x), aspect ratio and audio delay.</p>
+                </div>
+
+                <div class="feature-card reveal" data-reveal-delay="480">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <h3 data-i18n="f7.title">Hardware Acceleration</h3>
+                    <p data-i18n="f7.desc">DXVA2 & NVDEC support for buttery smooth playback. Your GPU does the heavy lifting.</p>
+                </div>
+
+                <div class="feature-card reveal" data-reveal-delay="560">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <h3 data-i18n="f8.title">Subtitle Power</h3>
+                    <p data-i18n="f8.desc">SRT, ASS, SUB support with sync, dual subtitles, live translation and audio-to-text via Vosk.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============== Screenshots ============== -->
+    <section class="screenshots" id="screenshots">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-tag" data-i18n="ss.tag">Screenshots</div>
+                <h2 class="section-title" data-i18n="ss.title">Designed with care.</h2>
+                <p class="section-desc" data-i18n="ss.desc">Every pixel is intentional. Take a look at what makes Aryo feel different.</p>
+            </div>
+
+            <div class="screenshots-grid">
+                <div class="screenshot-card reveal" data-reveal-delay="0" data-shot="player">
+                    <div class="shot-window">
+                        <div class="shot-titlebar">
+                            <span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span>
+                            <span class="shot-title">Aryo Video Player</span>
+                        </div>
+                        <div class="shot-content shot-image">
+                            <img src="assets/screenshot-player-ui.png" alt="Aryo Video Player — Main Interface" loading="lazy" />
+                        </div>
+                    </div>
+                    <div class="shot-label" data-i18n="ss.l1">Main Player</div>
+                </div>
+
+                <div class="screenshot-card reveal" data-reveal-delay="100" data-shot="translate">
+                    <div class="shot-window">
+                        <div class="shot-titlebar">
+                            <span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span>
+                            <span class="shot-title">AI Subtitle Translator</span>
+                        </div>
+                        <div class="shot-content shot-image">
+                            <img src="assets/screenshot-ai-translator.png" alt="Aryo AI Subtitle Translator — method ariyo v1" loading="lazy" />
+                        </div>
+                    </div>
+                    <div class="shot-label" data-i18n="ss.l3">Subtitle Translation</div>
+                </div>
+
+                <div class="screenshot-card reveal" data-reveal-delay="200" data-shot="cinema">
+                    <div class="shot-window">
+                        <div class="shot-titlebar">
+                            <span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span>
+                            <span class="shot-title">Now Playing</span>
+                        </div>
+                        <div class="shot-content shot-image">
+                            <img src="assets/screenshot-video-playing.png" alt="Aryo Video Player — Now Playing with subtitles" loading="lazy" />
+                        </div>
+                    </div>
+                    <div class="shot-label" data-i18n="ss.l4">Now Playing</div>
+                </div>
+
+                <div class="screenshot-card reveal" data-reveal-delay="300" data-shot="playlist">
+                    <div class="shot-window">
+                        <div class="shot-titlebar">
+                            <span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span>
+                            <span class="shot-title">Playlist</span>
+                        </div>
+                        <div class="shot-content shot-playlist">
+                            <div class="shot-item active"><span>1</span><span>interstellar_4k.mkv</span></div>
+                            <div class="shot-item"><span>2</span><span>tenet_2020.mkv</span></div>
+                            <div class="shot-item"><span>3</span><span>dune_part_two.mp4</span></div>
+                            <div class="shot-item"><span>4</span><span>blade_runner_2049.mp4</span></div>
+                            <div class="shot-item"><span>5</span><span>arrival_2016.mkv</span></div>
+                        </div>
+                    </div>
+                    <div class="shot-label" data-i18n="ss.l2">Playlist Manager</div>
+                </div>
+
+                <div class="screenshot-card reveal" data-reveal-delay="400" data-shot="audio">
+                    <div class="shot-window">
+                        <div class="shot-titlebar">
+                            <span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span>
+                            <span class="shot-title">Audio to Text</span>
+                        </div>
+                        <div class="shot-content shot-audio">
+                            <div class="shot-audio-wave">
+                                <span></span><span></span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                            <div class="shot-audio-text">"Where we're going, we don't need roads."</div>
+                            <div class="shot-audio-status">● Recording · Vosk engine</div>
+                        </div>
+                    </div>
+                    <div class="shot-label" data-i18n="ss.l5">Audio to Text</div>
+                </div>
+
+                <div class="screenshot-card reveal" data-reveal-delay="500" data-shot="settings">
+                    <div class="shot-window">
+                        <div class="shot-titlebar">
+                            <span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span>
+                            <span class="shot-title">Settings</span>
+                        </div>
+                        <div class="shot-content shot-settings">
+                            <div class="shot-setting">
+                                <span>Brightness</span>
+                                <div class="shot-mini-bar"><div class="shot-mini-fill" style="width:70%"></div></div>
+                            </div>
+                            <div class="shot-setting">
+                                <span>Contrast</span>
+                                <div class="shot-mini-bar"><div class="shot-mini-fill" style="width:55%"></div></div>
+                            </div>
+                            <div class="shot-setting">
+                                <span>Saturation</span>
+                                <div class="shot-mini-bar"><div class="shot-mini-fill" style="width:80%"></div></div>
+                            </div>
+                            <div class="shot-setting">
+                                <span>Volume</span>
+                                <div class="shot-mini-bar"><div class="shot-mini-fill" style="width:80%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="shot-label" data-i18n="ss.l6">Image Controls</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============== Lightbox ============== -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-backdrop"></div>
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightboxClose" aria-label="Close">×</button>
+            <div class="lightbox-window">
+                <div class="lightbox-titlebar">
+                    <span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span>
+                    <span class="lightbox-title">Aryo Video Player</span>
+                </div>
+                <div class="lightbox-body" id="lightboxBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============== Why Aryo ============== -->
+    <section class="why" id="why">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-tag" data-i18n="why.tag">Why Aryo</div>
+                <h2 class="section-title" data-i18n="why.title">Built different. <span class="gradient">Built better.</span></h2>
+                <p class="section-desc" data-i18n="why.desc">Other players were designed in 2003. Aryo was designed in 2024.</p>
+            </div>
+
+            <div class="why-stats reveal">
+                <div class="why-stat">
+                    <div class="why-stat-num gradient">0</div>
+                    <div class="why-stat-suffix">ads</div>
+                    <div class="why-stat-label" data-i18n="why.s1l">Zero advertisements, ever</div>
+                </div>
+                <div class="why-stat">
+                    <div class="why-stat-num gradient">120<span>MB</span></div>
+                    <div class="why-stat-suffix">size</div>
+                    <div class="why-stat-label" data-i18n="why.s2l">Lightweight footprint</div>
+                </div>
+                <div class="why-stat">
+                    <div class="why-stat-num gradient">7+</div>
+                    <div class="why-stat-suffix">formats</div>
+                    <div class="why-stat-label" data-i18n="why.s3l">All popular video formats</div>
+                </div>
+                <div class="why-stat">
+                    <div class="why-stat-num gradient">100+</div>
+                    <div class="why-stat-suffix">languages</div>
+                    <div class="why-stat-label" data-i18n="why.s4l">Subtitle translation</div>
+                </div>
+            </div>
+
+            <div class="comparison reveal">
+                <div class="comparison-header">
+                    <div></div>
+                    <div class="comparison-aryo">Aryo</div>
+                    <div data-i18n="cmp.traditional">Traditional Players</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-feature" data-i18n="cmp.r1">Modern dark UI</div>
+                    <div class="check yes">✓</div>
+                    <div class="check no">✕</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-feature" data-i18n="cmp.r2">Subtitle translation</div>
+                    <div class="check yes">✓</div>
+                    <div class="check no">✕</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-feature" data-i18n="cmp.r3">Audio to text (offline)</div>
+                    <div class="check yes">✓</div>
+                    <div class="check no">✕</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-feature" data-i18n="cmp.r4">Cinema & night mode</div>
+                    <div class="check yes">✓</div>
+                    <div class="check no">✕</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-feature" data-i18n="cmp.r5">No ads, no telemetry</div>
+                    <div class="check yes">✓</div>
+                    <div class="check no">✕</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-feature" data-i18n="cmp.r6">Hardware acceleration</div>
+                    <div class="check yes">✓</div>
+                    <div class="check no">✓</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-feature" data-i18n="cmp.r7">Modern .NET 9 stack</div>
+                    <div class="check yes">✓</div>
+                    <div class="check no">✕</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-feature" data-i18n="cmp.r8">Free forever</div>
+                    <div class="check yes">✓</div>
+                    <div class="check no">—</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============== Download ============== -->
+    <section class="download" id="download">
+        <div class="container">
+            <div class="download-card reveal">
+                <div class="download-glow"></div>
+                <div class="download-content">
+                    <div class="download-logo-wrap">
+                        <img src="assets/logo.png" alt="Aryo Video Player" class="download-logo" />
+                    </div>
+                    <h2 class="download-title" data-i18n="dl.title">Ready to experience it?</h2>
+                    <p class="download-desc" data-i18n="dl.desc">Download Aryo Video Player for Windows. Free, fast, and ready in seconds.</p>
+
+                    <div class="download-buttons">
+                        <a href="#" id="primaryDownload" class="btn btn-primary btn-xl">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span data-i18n="dl.btn">Download v1.0.0</span>
+                        </a>
+                        <a href="https://github.com/" class="btn btn-ghost btn-xl" target="_blank" rel="noopener" data-i18n="dl.src">View Source</a>
+                    </div>
+
+                    <div class="download-meta">
+                        <div class="download-meta-item">
+                            <div class="download-meta-icon">🪟</div>
+                            <div>
+                                <div class="download-meta-label" data-i18n="dl.m1l">Platform</div>
+                                <div class="download-meta-value" data-i18n="dl.m1v">Windows 10/11 (64-bit)</div>
+                            </div>
+                        </div>
+                        <div class="download-meta-item">
+                            <div class="download-meta-icon">📦</div>
+                            <div>
+                                <div class="download-meta-label" data-i18n="dl.m2l">Size</div>
+                                <div class="download-meta-value" data-i18n="dl.m2v">~120 MB</div>
+                            </div>
+                        </div>
+                        <div class="download-meta-item">
+                            <div class="download-meta-icon">⚙️</div>
+                            <div>
+                                <div class="download-meta-label" data-i18n="dl.m3l">Framework</div>
+                                <div class="download-meta-value" data-i18n="dl.m3v">.NET 9 Desktop Runtime</div>
+                            </div>
+                        </div>
+                        <div class="download-meta-item">
+                            <div class="download-meta-icon">🆓</div>
+                            <div>
+                                <div class="download-meta-label" data-i18n="dl.m4l">License</div>
+                                <div class="download-meta-value" data-i18n="dl.m4v">Free for personal use</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============== Developer ============== -->
+    <section class="developer" id="developer">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-tag" data-i18n="dev.tag">Behind the Code</div>
+                <h2 class="section-title" data-i18n="dev.title">Crafted by the AzarCoder team, <br />with obsessive attention to detail.</h2>
+            </div>
+
+            <div class="dev-grid">
+                <div class="dev-card reveal" data-reveal-delay="0">
+                    <div class="dev-avatar">
+                        <img src="assets/logoazr.png" alt="AzarCoder" class="dev-avatar-img" />
+                    </div>
+                    <h3 data-i18n="dev.name">AzarCoder Team</h3>
+                    <p class="dev-role" data-i18n="dev.role">تیم آذر کد · Development Studio</p>
+                    <p class="dev-bio" data-i18n="dev.bio">A passionate Iranian development team building elegant software with soul. Aryo is named after Ariobarzanes — the Persian commander who stood against Alexander with only 2,500 men.</p>
+                    <div class="dev-socials">
+                        <a href="https://t.me/Thesurenax" target="_blank" rel="noopener" class="dev-social" title="Telegram">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+                        </a>
+                        <a href="https://github.com/" target="_blank" rel="noopener" class="dev-social" title="GitHub">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        </a>
+                        <a href="https://www.instagram.com/Azar_Code" target="_blank" rel="noopener" class="dev-social" title="Instagram">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="dev-stack reveal" data-reveal-delay="150">
+                    <h3 data-i18n="dev.tech">Tech Stack</h3>
+                    <div class="stack-grid">
+                        <div class="stack-item">
+                            <div class="stack-icon" style="--c:#512BD4">.NET</div>
+                            <div class="stack-name">.NET 9</div>
+                        </div>
+                        <div class="stack-item">
+                            <div class="stack-icon" style="--c:#0078D4">WPF</div>
+                            <div class="stack-name">WPF</div>
+                        </div>
+                        <div class="stack-item">
+                            <div class="stack-icon" style="--c:#FF7C00">VLC</div>
+                            <div class="stack-name">LibVLC</div>
+                        </div>
+                        <div class="stack-item">
+                            <div class="stack-icon" style="--c:#19D4F5">FF</div>
+                            <div class="stack-name">FFmpeg</div>
+                        </div>
+                        <div class="stack-item">
+                            <div class="stack-icon" style="--c:#9d4dff">VK</div>
+                            <div class="stack-name">Vosk</div>
+                        </div>
+                        <div class="stack-item">
+                            <div class="stack-icon" style="--c:#FF4DC4">C#</div>
+                            <div class="stack-name">C#</div>
+                        </div>
+                    </div>
+
+                    <div class="dev-philosophy">
+                        <h4 data-i18n="dev.phil">Philosophy</h4>
+                        <p data-i18n="dev.phild">Software should feel alive. Every interaction should feel considered. Every pixel should have a purpose. Aryo is not a product — it's a piece of craft.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============== FAQ ============== -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-tag" data-i18n="faq.tag">FAQ</div>
+                <h2 class="section-title" data-i18n="faq.title">Questions? Answered.</h2>
+                <p class="section-desc" data-i18n="faq.desc">Everything you need to know about Aryo Video Player.</p>
+            </div>
+
+            <div class="faq-list reveal">
+                <details class="faq-item">
+                    <summary>
+                        <span data-i18n="faq.q1">Is Aryo Video Player really free?</span>
+                        <span class="faq-icon">+</span>
+                    </summary>
+                    <p data-i18n="faq.a1">Yes — 100% free, no hidden costs, no premium tier, no ads, no telemetry. Built as a passion project by a single developer.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>
+                        <span data-i18n="faq.q2">What video formats are supported?</span>
+                        <span class="faq-icon">+</span>
+                    </summary>
+                    <p data-i18n="faq.a2">All major formats including MP4, AVI, MKV, MOV, WMV, FLV, WebM. Because Aryo uses LibVLC under the hood, it can play virtually anything VLC can play — including 4K HDR content.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>
+                        <span data-i18n="faq.q3">Does it support subtitles?</span>
+                        <span class="faq-icon">+</span>
+                    </summary>
+                    <p data-i18n="faq.a3">Yes! Aryo supports SRT, ASS and SUB subtitle files. It also features live translation to 100+ languages, dual subtitles (original + translation), and an offline audio-to-text engine powered by Vosk.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>
+                        <span data-i18n="faq.q4">What are the system requirements?</span>
+                        <span class="faq-icon">+</span>
+                    </summary>
+                    <p data-i18n="faq.a4">Windows 10 or 11 (64-bit), .NET 9 Desktop Runtime (auto-installed), and about 120 MB of disk space. Works on any modern PC.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>
+                        <span data-i18n="faq.q5">Is the source code available?</span>
+                        <span class="faq-icon">+</span>
+                    </summary>
+                    <p data-i18n="faq.a5">The binary is free to download. The full source code repository will be available on GitHub soon. Star the repo to be notified.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>
+                        <span data-i18n="faq.q6">Why is it called "Aryo"?</span>
+                        <span class="faq-icon">+</span>
+                    </summary>
+                    <p data-i18n="faq.a6">Aryo is named after Ariobarzanes (آریو برزن) — a legendary Persian commander who, with only 2,500 soldiers, held the Persian Gate against Alexander the Great's 40,000-strong army. The player is a tribute to that spirit of courage and craft.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>
+                        <span data-i18n="faq.q7">How do I report a bug or request a feature?</span>
+                        <span class="faq-icon">+</span>
+                    </summary>
+                    <p data-i18n="faq.a7">Reach out via Telegram at <a href="https://t.me/Thesurenax" target="_blank" rel="noopener">@Thesurenax</a> or open an issue on the GitHub repository. We read everything.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============== Footer ============== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand-col">
+                    <a href="#hero" class="footer-brand">
+                        <img src="assets/logo-32.ico" alt="Aryo" class="footer-logo" />
+                        <span>Aryo <span class="gradient">Video Player</span></span>
+                    </a>
+                    <div class="footer-credit">
+                        <span data-i18n="footer.by">A product by</span>
+                        <img src="assets/logoazr.png" alt="AzarCoder" class="footer-credit-logo" />
+                        <strong>AzarCoder Team</strong>
+                    </div>
+                    <p class="footer-tagline" data-i18n="footer.tagline">A modern video player for Windows, built with soul.</p>
+                    <div class="footer-socials">
+                        <a href="https://t.me/Thesurenax" target="_blank" rel="noopener" class="footer-social" title="Telegram">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+                        </a>
+                        <a href="https://github.com/" target="_blank" rel="noopener" class="footer-social" title="GitHub">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        </a>
+                        <a href="https://www.instagram.com/Azar_Code" target="_blank" rel="noopener" class="footer-social" title="Instagram">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4 data-i18n="footer.product">Product</h4>
+                    <a href="#features" data-i18n="nav.features">Features</a>
+                    <a href="#screenshots" data-i18n="nav.screenshots">Screenshots</a>
+                    <a href="#download" data-i18n="nav.download">Download</a>
+                    <a href="#faq" data-i18n="nav.faq">FAQ</a>
+                </div>
+
+                <div class="footer-col">
+                    <h4 data-i18n="footer.resources">Resources</h4>
+                    <a href="https://github.com/" target="_blank" rel="noopener" data-i18n="footer.src">Source Code</a>
+                    <a href="#" data-i18n="footer.changelog">Changelog</a>
+                    <a href="#" data-i18n="footer.license">License</a>
+                </div>
+
+                <div class="footer-col">
+                    <h4 data-i18n="footer.contact">Contact</h4>
+                    <a href="https://t.me/Thesurenax" target="_blank" rel="noopener">@Thesurenax (Telegram)</a>
+                    <a href="https://www.instagram.com/Azar_Code" target="_blank" rel="noopener">@Azar_Code (Instagram)</a>
+                    <a href="mailto:hello@aryoplayer.ir">hello@aryoplayer.ir</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div data-i18n="footer.copyright">© 2024 Aryo Video Player. Crafted with care by AzarCoder.</div>
+                <div class="footer-made" data-i18n="footer.made">Made with ♥ in Iran</div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
