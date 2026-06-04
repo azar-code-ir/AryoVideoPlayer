@@ -9,7 +9,7 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <AssemblyName>AryoVideoPlayer</AssemblyName>
     <RootNamespace>AryoVideoPlayer</RootNamespace>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Aryo Team</Authors>
     <Description>Aryo Video Player - Professional Video Player</Description>
   </PropertyGroup>
