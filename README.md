@@ -177,8 +177,8 @@ AryoVideoPlayer/
 
 <div align="center">
 
-[![Telegram](https://img.shields.io/badge/Telegram-@Thesurenax-blue?style=for-the-badge&logo=telegram)](https://t.me/Thesurenax)
-[![GitHub](https://img.shields.io/badge/GitHub-azar--code--ir-gray?style=for-the-badge&logo=github)](https://github.com/azar-code-ir)
+[![Telegram](https://img.shields.io/badge/Telegram-@Thesurenax-blue?style=for-the-badge&logo=telegram)](https://t.me/)
+[![GitHub](https://img.shields.io/badge/GitHub-ShahBazTeam-gray?style=for-the-badge&logo=github)](https://github.com/ShahBazTeam)
 
 </div>
 
@@ -186,7 +186,8 @@ AryoVideoPlayer/
 
 <div align="center">
 
-**ساخته شده با ❤️ توسط [تیم آذر کد](https://github.com/azar-code-ir)**
+**ساخته شده با ❤️ توسط [تیم شهباز]
+(https://github.com/ShahBazTeam)
 
 به یاد آریو برزن، سردار دلیر پارسی 🦁🔥
 
